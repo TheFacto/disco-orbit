@@ -59,6 +59,13 @@ export default class extends Phaser.State {
                     distanceToThreshold: this.thresholdDistance
                 })
             );
+
+        // TODO: Actually check if you hit the satellite, then go into orbit
+        this.satellites.forEach((s) => {
+            if(s.position.x >= this.threshold.position.x) {
+                s.enterOrbit(this.planet);
+            }
+        });
         this.debugText.setText(this.getTick());
     }
 

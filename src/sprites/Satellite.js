@@ -6,6 +6,17 @@ export default class Satellite extends Phaser.Sprite {
         super(game, x, y, asset);
         this.speed = speed;
         this.scale.setTo(0.5, 0.5);
+        this.anchor.setTo(0.5);
+        this.isOrbiting = false;
+    }
+
+    enterOrbit(orbitAround) {
+        this.isOrbiting = true;
+        this.pivot.x = (orbitAround.width + 50);
+
+        // Hook to the position
+        this.position.x = orbitAround.position.x;
+        this.position.y = orbitAround.position.y;
     }
 
     update() {
@@ -15,7 +26,13 @@ export default class Satellite extends Phaser.Sprite {
         }
 
         const timeDelta = this.game.time.totalElapsedSeconds() - this.lastUpdateTime;
-        this.position.x += this.speed * timeDelta;
+        if (!this.isOrbiting) {
+            this.position.x += this.speed * timeDelta;
+        }
         this.lastUpdateTime = this.game.time.totalElapsedSeconds();
+
+        if(this.isOrbiting) {
+            this.rotation += 0.01;
+        }
     }
 }
