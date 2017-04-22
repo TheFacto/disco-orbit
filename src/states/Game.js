@@ -31,14 +31,20 @@ export default class extends Phaser.State {
         });
 
         this.music = this.add.audio(orbitalSong.id);
-        this.music.play();
         this.musicStartTime = this.game.time.totalElapsedSeconds();
-
         this.game.add.existing(this.planet);
         this.game.add.existing(this.threshold);
 
-        this.time.events.loop(Phaser.Timer.SECOND, () => {
-            console.log("Timer event");
+        const secondsPerBeat = (60 / orbitalSong.bpm) * 1000;
+        this.beatCount = 0;
+        this.time.events.loop(secondsPerBeat, () => {
+            console.log(`Beat: ${this.beatCount}`);
+            // Give 4 beats buffer
+            if(this.beatCount === 4) {
+                this.musicStartTime = this.game.time.totalElapsedSeconds();
+                this.music.play();
+            }
+            this.beatCount++;
         }, this);
 
     }
