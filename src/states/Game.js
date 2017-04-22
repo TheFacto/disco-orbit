@@ -2,14 +2,14 @@
 import Planet from '../sprites/Planet';
 import Phaser from 'phaser';
 import Threshold from '../sprites/Threshold';
-import { createNewSatellites } from '../managers/SattelitesManager';
+import { createSatelliteGroup } from '../managers/SattelitesManager';
 import orbitalSong from '../songs/orbital';
 
 export default class extends Phaser.State {
     init () {
-        this.satellites = [];
         this.beats = orbitalSong.ticks;
         this.thresholdDistance = this.world.width - 300;
+        this.satelliteSpeed = 100;
     }
 
     preload () {
@@ -32,12 +32,13 @@ export default class extends Phaser.State {
 
         this.music = this.add.audio(orbitalSong.id);
         this.musicStartTime = this.game.time.totalElapsedSeconds();
+        this.music.play();
         this.game.add.existing(this.planet);
         this.game.add.existing(this.threshold);
 
         const secondsPerBeat = (60 / orbitalSong.bpm) * 1000;
         this.beatCount = 0;
-        this.time.events.loop(secondsPerBeat, () => {
+        /*this.time.events.loop(secondsPerBeat, () => {
             console.log(`Beat: ${this.beatCount}`);
             // Give 4 beats buffer
             if(this.beatCount === 4) {
@@ -45,22 +46,21 @@ export default class extends Phaser.State {
                 this.music.play();
             }
             this.beatCount++;
-        }, this);
+        }, this); */
 
+        this.satelliteGroup = createSatelliteGroup(this, this.beats, this.thresholdDistance, this.satelliteSpeed);
+        //this.satelliteGroup.position.x = -40;
+        this.game.add.existing(this.satelliteGroup);
+        this.lastFrameTime = this.game.time.totalElapsedSeconds();
     }
 
     update () {
-        this.satellites =
-            this.satellites.concat(
-                createNewSatellites({
-                    state: this,
-                    beats: this.beats,
-                    currentTick: this.getTick(),
-                    distanceToThreshold: this.thresholdDistance
-                })
-            );
         this.debugText.setText(this.getTick());
+        const delta = this.game.time.totalElapsedSeconds() - this.lastFrameTime;
+        this.satelliteGroup.position.x += this.satelliteSpeed * delta;
+        this.lastFrameTime = this.game.time.totalElapsedSeconds();
     }
+
 
     getTick() {
         return this.game.time.totalElapsedSeconds() - this.musicStartTime;
