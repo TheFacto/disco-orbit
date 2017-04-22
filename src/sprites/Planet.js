@@ -1,11 +1,11 @@
-import Phaser from 'phaser'
+import Phaser from 'phaser';
 
 export default class extends Phaser.Sprite {
-    constructor({game, x, y}) {
-        super(game, x, y, 'planet');
+    constructor ({game, x, y}) {
+        super(game, x, y, 'planet_01');
 
-        this.anchor.setTo(0.5)
-        this.height = 100;
-        this.width = 100;
+        this.anchor.setTo(0.5);
+        // this.height = 100;
+        // this.width = 100;
     }
 }
