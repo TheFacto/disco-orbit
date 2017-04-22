@@ -9,7 +9,7 @@ export default class extends Phaser.State {
     init () {
         this.beats = orbitalSong.ticks;
         this.thresholdDistance = this.world.width - 300;
-        this.satelliteSpeed = 100;
+        this.satelliteSpeed = 200;
     }
 
     preload () {
@@ -48,9 +48,15 @@ export default class extends Phaser.State {
             this.beatCount++;
         }, this); */
 
+        // Satellite Group
         this.satelliteGroup = createSatelliteGroup(this, this.beats, this.thresholdDistance, this.satelliteSpeed);
-        //this.satelliteGroup.position.x = -40;
+        this.satelliteGroup.position.x = -45;
         this.game.add.existing(this.satelliteGroup);
+
+        // Orbit Group
+        this.orbitGroup = new Phaser.Group(this.game);
+        this.game.add.existing(this.orbitGroup);
+
         this.lastFrameTime = this.game.time.totalElapsedSeconds();
 
         // set-up the physics bodies
@@ -73,9 +79,29 @@ export default class extends Phaser.State {
     }
 
     update () {
+        // Update satellite group
         this.debugText.setText(this.getTick());
         const delta = this.game.time.totalElapsedSeconds() - this.lastFrameTime;
         this.satelliteGroup.position.x += this.satelliteSpeed * delta;
+
+        // Update orbit
+        const orbitGroup = this.orbitGroup;
+        const planet = this.planet;
+        const satPos = this.satelliteGroup.position.x;
+        const threshPos = this.threshold.position.x;
+        const satGroup = this.satelliteGroup;
+        const toRemove = [];
+        this.satelliteGroup.forEach((satellite) => {
+            if(satellite.position.x + satPos >= threshPos) {
+                toRemove.push(satellite);
+            }
+        });
+        toRemove.forEach((satellite) => {
+            satGroup.remove(satellite);
+            satellite.enterOrbit(planet);
+            orbitGroup.add(satellite);
+        });
+
         this.lastFrameTime = this.game.time.totalElapsedSeconds();
 
         if (this.game.physics.arcade.collide(this.threshold, this.satelliteGroup, this.collisionHandler, this.processHandler, this)) {
