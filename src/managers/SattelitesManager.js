@@ -15,7 +15,8 @@ const createSatellites = (game, beats, thresholdX, speed) =>
 
 export const createSatelliteGroup = (game, beats, thresholdX, speed) => {
     const group = new Phaser.Group(game);
+
     createSatellites(game, beats, thresholdX, speed)
-        .forEach((s) => group.addChild(s));
+        .forEach((s) => group.add(s));
     return group;
 };

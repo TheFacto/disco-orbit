@@ -58,6 +58,23 @@ export default class extends Phaser.State {
         this.game.add.existing(this.orbitGroup);
 
         this.lastFrameTime = this.game.time.totalElapsedSeconds();
+
+        // set-up the physics bodies
+        this.game.physics.startSystem(Phaser.Physics.ARCADE);
+        this.game.physics.arcade.enable(this.threshold);
+        this.game.physics.arcade.enable(this.satelliteGroup);
+
+        // add physics to group
+        this.satelliteGroup.enableBody = true;
+        this.satelliteGroup.enableBodyDebug = true;
+        this.satelliteGroup.physicsBodyType = Phaser.Physics.Arcade;
+    }
+
+    render() {
+        //this.game.debug.body(this.threshold);
+        //this.satelliteGroup.forEach((a) => {
+        //    this.game.debug.body(a)
+        //});
     }
 
     update () {
@@ -66,27 +83,43 @@ export default class extends Phaser.State {
         const delta = this.game.time.totalElapsedSeconds() - this.lastFrameTime;
         this.satelliteGroup.position.x += this.satelliteSpeed * delta;
 
-        // Update orbit
-        const orbitGroup = this.orbitGroup;
-        const planet = this.planet;
-        const satPos = this.satelliteGroup.position.x;
-        const threshPos = this.threshold.position.x;
-        const satGroup = this.satelliteGroup;
-        const toRemove = [];
-        this.satelliteGroup.forEach((satellite) => {
-            if(satellite.position.x + satPos >= threshPos) {
-                toRemove.push(satellite);
-            }
-        });
-        toRemove.forEach((satellite) => {
-            satGroup.remove(satellite);
-            satellite.enterOrbit(planet);
-            orbitGroup.add(satellite);
-        });
-
         this.lastFrameTime = this.game.time.totalElapsedSeconds();
+
+        if (this.game.physics.arcade.collide(this.threshold, this.satelliteGroup, this.collisionHandler, this.processHandler, this)) {
+
+        }
     }
 
+    processHandler(threshold, satellite) {
+        return true;
+    }
+
+    collisionHandler(threshold, satellite) {
+        if (this.hitcount == undefined) {
+            this.hitcount = 0;
+        } else {
+            this.hitcount++;
+        }
+
+        if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+            console.log("spacebar pressed while in threshold zone");
+
+            // Update orbit
+            const orbitGroup = this.orbitGroup;
+            const planet = this.planet;
+            const satGroup = this.satelliteGroup;
+            const toRemove = [];
+            toRemove.push(satellite);
+
+            toRemove.forEach((satellite) => {
+                satGroup.remove(satellite);
+                satellite.enterOrbit(planet);
+                orbitGroup.add(satellite);
+            });
+        }
+
+        //console.log("hitcount: " + this.hitcount);
+    }
 
     getTick() {
         return this.game.time.totalElapsedSeconds() - this.musicStartTime;
