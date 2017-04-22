@@ -2,14 +2,10 @@ import Phaser from 'phaser'
 
 export default class extends Phaser.Sprite {
     constructor({game, x, y}) {
-        super(game, x, y);
+        super(game, x, y, 'planet');
 
-        var graphics = game.add.graphics(0, 0);
-
-        graphics.lineStyle(2, 0xffd900, 1);
-
-        graphics.beginFill(0x0000FF, 1);
-        graphics.drawCircle(x, y, 100);
+        this.anchor.setTo(0.5)
+        this.height = 100;
+        this.width = 100;
     }
 }
-
