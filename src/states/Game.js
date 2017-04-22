@@ -52,6 +52,24 @@ export default class extends Phaser.State {
         //this.satelliteGroup.position.x = -40;
         this.game.add.existing(this.satelliteGroup);
         this.lastFrameTime = this.game.time.totalElapsedSeconds();
+
+        // set-up the physics bodies
+        this.game.physics.startSystem(Phaser.Physics.ARCADE);
+        this.game.physics.arcade.enable(this.threshold);
+        this.game.physics.arcade.enable(this.satelliteGroup);
+
+        // add physics to group
+        this.satelliteGroup.enableBody = true;
+        this.satelliteGroup.enableBodyDebug = true;
+        this.satelliteGroup.physicsBodyType = Phaser.Physics.Arcade;
+    }
+
+    render() {
+        this.game.debug.body(this.threshold);
+        this.satelliteGroup.forEach((a) => {
+            //console.log(a);
+            this.game.debug.body(a)
+        });
     }
 
     update () {
@@ -59,8 +77,26 @@ export default class extends Phaser.State {
         const delta = this.game.time.totalElapsedSeconds() - this.lastFrameTime;
         this.satelliteGroup.position.x += this.satelliteSpeed * delta;
         this.lastFrameTime = this.game.time.totalElapsedSeconds();
+
+        if (this.game.physics.arcade.collide(this.threshold, this.satelliteGroup, this.collisionHandler, this.processHandler, this)) {
+
+        }
     }
 
+    processHandler(threshold, satellite) {
+        return true;
+    }
+
+    collisionHandler(threshold, satellite) {
+        if (this.hitcount == undefined && satellite.alive) {
+            this.hitcount = 0;
+        } else {
+            this.hitcount++;
+        }
+
+        satellite.kill();
+        console.log("hitcount: " + this.hitcount);
+    }
 
     getTick() {
         return this.game.time.totalElapsedSeconds() - this.musicStartTime;
