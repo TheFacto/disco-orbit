@@ -1,4 +1,5 @@
 const orbital = {
+    id: "orbital",
     asset: "Orbital.ogg",
     bpm: 120,
     ticks: [
