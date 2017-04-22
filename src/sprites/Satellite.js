@@ -4,11 +4,23 @@ export default class Satellite extends Phaser.Sprite {
 
     constructor ({ game, x, y, asset, speed }) {
         super(game, x, y, asset);
-        this.speed = speed;
         this.scale.setTo(0.5, 0.5);
-        //this.scale.setTo(1,)
+        this.anchor.setTo(0.5);
+        this.isOrbiting = false;
+    }
+
+    enterOrbit(orbitAround) {
+        this.isOrbiting = true;
+        this.pivot.x = (orbitAround.width + 10);
+
+        // Hook to the position
+        this.position.x = orbitAround.position.x;
+        this.position.y = orbitAround.position.y;
     }
 
     update() {
+        if(this.isOrbiting) {
+            this.rotation += 0.01;
+        }
     }
 }
