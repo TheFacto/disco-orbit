@@ -3,6 +3,7 @@ import Planet from '../sprites/Planet';
 import Phaser from 'phaser';
 import Threshold from '../sprites/Threshold';
 import { createNewSatellites } from '../managers/SattelitesManager';
+import orbitalSong from "../songs/orbital";
 
 export default class extends Phaser.State {
     init () {
