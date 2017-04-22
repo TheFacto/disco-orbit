@@ -71,10 +71,10 @@ export default class extends Phaser.State {
     }
 
     render() {
-        this.game.debug.body(this.threshold);
-        this.satelliteGroup.forEach((a) => {
-            this.game.debug.body(a)
-        });
+        //this.game.debug.body(this.threshold);
+        //this.satelliteGroup.forEach((a) => {
+        //    this.game.debug.body(a)
+        //});
     }
 
     update () {
