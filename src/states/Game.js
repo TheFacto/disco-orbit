@@ -1,6 +1,7 @@
 /* globals __DEV__ */
 import Phaser from 'phaser'
 import Mushroom from '../sprites/Mushroom'
+import Planet from '../sprites/Planet';
 
 export default class extends Phaser.State {
   init () {}
@@ -21,9 +22,16 @@ export default class extends Phaser.State {
       x: this.world.centerX,
       y: this.world.centerY,
       asset: 'mushroom'
-    })
+    });
 
-    this.game.add.existing(this.mushroom)
+    this.planet = new Planet({
+        game: this,
+        x: this.world.width - 150,
+        y: this.world.centerY
+    });
+
+    this.game.add.existing(this.mushroom);
+    this.game.add.existing(this.planet);
   }
 
   render () {
