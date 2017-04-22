@@ -9,7 +9,7 @@ export default class extends Phaser.State {
     init () {
         this.beats = orbitalSong.ticks;
         this.thresholdDistance = this.world.width - 300;
-        this.satelliteSpeed = 100;
+        this.satelliteSpeed = 200;
     }
 
     preload () {
@@ -49,7 +49,7 @@ export default class extends Phaser.State {
         }, this); */
 
         this.satelliteGroup = createSatelliteGroup(this, this.beats, this.thresholdDistance, this.satelliteSpeed);
-        //this.satelliteGroup.position.x = -40;
+        this.satelliteGroup.position.x = -45;
         this.game.add.existing(this.satelliteGroup);
         this.lastFrameTime = this.game.time.totalElapsedSeconds();
     }
