@@ -6,8 +6,8 @@ const createSatellites = (game, beats, thresholdX, speed) =>
     beats.map(
         (beat) => new Satellite({
             game: game,
-            x: thresholdX - beat * speed,
-            y: getRandomInt(0, 200),
+            y: thresholdX + beat * speed,
+            x: getRandomInt(0, game.world.width),
             asset: 'mushroom',
             speed: 0
         })
