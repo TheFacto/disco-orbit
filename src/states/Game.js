@@ -73,7 +73,6 @@ export default class extends Phaser.State {
     render() {
         this.game.debug.body(this.threshold);
         this.satelliteGroup.forEach((a) => {
-            //console.log(a);
             this.game.debug.body(a)
         });
     }
@@ -83,24 +82,6 @@ export default class extends Phaser.State {
         this.debugText.setText(this.getTick());
         const delta = this.game.time.totalElapsedSeconds() - this.lastFrameTime;
         this.satelliteGroup.position.x += this.satelliteSpeed * delta;
-
-        // Update orbit
-        const orbitGroup = this.orbitGroup;
-        const planet = this.planet;
-        const satPos = this.satelliteGroup.position.x;
-        const threshPos = this.threshold.position.x;
-        const satGroup = this.satelliteGroup;
-        const toRemove = [];
-        this.satelliteGroup.forEach((satellite) => {
-            if(satellite.position.x + satPos >= threshPos) {
-                toRemove.push(satellite);
-            }
-        });
-        toRemove.forEach((satellite) => {
-            satGroup.remove(satellite);
-            satellite.enterOrbit(planet);
-            orbitGroup.add(satellite);
-        });
 
         this.lastFrameTime = this.game.time.totalElapsedSeconds();
 
@@ -114,14 +95,30 @@ export default class extends Phaser.State {
     }
 
     collisionHandler(threshold, satellite) {
-        if (this.hitcount == undefined && satellite.alive) {
+        if (this.hitcount == undefined) {
             this.hitcount = 0;
         } else {
             this.hitcount++;
         }
 
-        satellite.kill();
-        console.log("hitcount: " + this.hitcount);
+        if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+            console.log("spacebar pressed while in threshold zone");
+
+            // Update orbit
+            const orbitGroup = this.orbitGroup;
+            const planet = this.planet;
+            const satGroup = this.satelliteGroup;
+            const toRemove = [];
+            toRemove.push(satellite);
+
+            toRemove.forEach((satellite) => {
+                satGroup.remove(satellite);
+                satellite.enterOrbit(planet);
+                orbitGroup.add(satellite);
+            });
+        }
+
+        //console.log("hitcount: " + this.hitcount);
     }
 
     getTick() {
