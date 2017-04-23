@@ -20,6 +20,9 @@ export default class extends Phaser.State {
         this.load.image('planet_01', 'assets/images/planets/planet_01.png');
         // this.load.image('starry_night', 'assets/images/backgrounds/starry_night.png');
 
+        // Threshold
+        this.load.image('threshold_bar', 'assets/images/threshold/threshold_bar.png');
+        this.load.spritesheet('threshold_end', 'assets/images/threshold/threshold_end.png', 32, 32);
         this.load.spritesheet('starry_night', 'assets/images/backgrounds/starry_night.png', 64, 64);
 
         satellites.forEach((s) => {
