@@ -28,6 +28,7 @@ export default class extends Phaser.State {
 
         // Threshold
         this.load.image('threshold_bar', 'assets/images/threshold/threshold_bar.png');
+        this.load.spritesheet('threshold_sprite', 'assets/images/threshold/threshold_bar_animated.png', 32, 32);
         this.load.spritesheet('threshold_end', 'assets/images/threshold/threshold_end.png', 32, 32);
         this.load.spritesheet('starry_night', 'assets/images/backgrounds/starry_night.png', 64, 64);
 
