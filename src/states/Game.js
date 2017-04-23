@@ -8,7 +8,7 @@ import legendsSong from '../songs/legends';
 
 const setupSatelliteGroup = (state) => {
     state.satelliteGroup = createSatelliteGroup(state, state.beats, state.thresholdDistance, state.satelliteSpeed);
-    state.satelliteGroup.position.y = 0;
+    state.satelliteGroup.position.y = 10;
 
     state.game.add.existing(state.satelliteGroup);
     state.game.physics.arcade.enable(state.satelliteGroup);
