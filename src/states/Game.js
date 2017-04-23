@@ -139,8 +139,7 @@ export default class extends Phaser.State {
         this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
 
         // setup callbacks
-        this.game.input.keyboard.addCallbacks(this, null, this.keyReleased, null);
-        this.game.input.keyboard.addCallbacks(this, this.keyDown, null, null);
+        this.game.input.keyboard.addCallbacks(this, this.keyDown, this.keyReleased, null);
 
         this.missText = this.add.text(this.world.centerX, this.world.centerY + 30, 'Miss!', {
             font: '28px Arial',
