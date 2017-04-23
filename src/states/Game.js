@@ -6,6 +6,7 @@ import { createSatelliteGroup } from '../managers/SattelitesManager';
 import song from '../songs/planets';
 
 const ALLOWED_MISSES = 3;
+const SATELLITE_BOUNDING_BOX_Y_OFFSET = -7;
 
 const setupSatelliteGroup = (state) => {
     state.satelliteGroup = createSatelliteGroup(state, state.beats, state.thresholdDistance, state.satelliteSpeed);
@@ -18,6 +19,11 @@ const setupSatelliteGroup = (state) => {
     state.satelliteGroup.enableBody = true;
     state.satelliteGroup.enableBodyDebug = true;
     state.satelliteGroup.physicsBodyType = Phaser.Physics.Arcade;
+
+    // temp fix for collision bounds
+    state.satelliteGroup.forEach((s) => {
+        s.body.setSize(s.body.width, s.body.height, 0, SATELLITE_BOUNDING_BOX_Y_OFFSET);
+    });
 };
 
 const setupOrbitalGroup = (state) => {
@@ -124,6 +130,16 @@ const triggerTap = (state) => {
     state.planet.updateHealth(ALLOWED_MISSES - state.missCount);
 };
 
+const flyByMissDetection = (state) => {
+    state.satelliteGroup.forEach((s) => {
+        if (s.body.y < state.threshold.position.y - state.threshold.height && s.missed == false) {
+            s.missed = true;
+            state.missCount++;
+            console.log("exceeded threshold");
+        }
+    });
+}
+
 export default class extends Phaser.State {
     init () {
         this.beats = song.ticks;
@@ -169,10 +185,11 @@ export default class extends Phaser.State {
     }
 
     render () {
-        //this.game.debug.body(this.threshold);
-        //this.satelliteGroup.forEach((a) => {
-        //    this.game.debug.body(a)
-        //});
+        this.game.debug.body(this.threshold);
+        this.game.debug.body(this.planet);
+        this.satelliteGroup.forEach((a) => {
+            this.game.debug.body(a)
+        });
     }
 
     keyDown (key) {
@@ -203,6 +220,7 @@ export default class extends Phaser.State {
             this.allowPointerDown = true;
         }
 
+        flyByMissDetection(this);
         gameOverDetection(this);
     }
 
