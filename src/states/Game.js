@@ -3,7 +3,7 @@ import Planet from '../sprites/Planet';
 import Phaser from 'phaser';
 import Threshold from '../sprites/Threshold';
 import { createSatelliteGroup } from '../managers/SattelitesManager';
-import legendsSong from '../songs/legends';
+import song from '../songs/planets';
 
 const ALLOWED_MISSES = 3;
 
@@ -33,12 +33,12 @@ const setupThresholdEnds = (state) => {
     const end01 = state.add.sprite(16, state.thresholdDistance, 'threshold_end');
     end01.anchor.setTo(0.5);
     end01.animations.add('pulse');
-    end01.animations.play('pulse', calculateTwinkle(legendsSong.bpm), true);
+    end01.animations.play('pulse', calculateTwinkle(song.bpm), true);
 
     const end02 = state.add.sprite(state.world.width - 16, state.thresholdDistance, 'threshold_end');
     end02.anchor.setTo(0.5);
     end02.animations.add('pulse');
-    end02.animations.play('pulse', calculateTwinkle(legendsSong.bpm), true);
+    end02.animations.play('pulse', calculateTwinkle(song.bpm), true);
 };
 
 const setupThreshold = (state) => {
@@ -56,7 +56,7 @@ const setupStaticGraphics = (state) => {
     // Background
     const stars = state.add.tileSprite(0, 0, state.game.world.width, state.game.world.height, 'starry_night');
     stars.animations.add('twinkle');
-    stars.animations.play('twinkle', calculateTwinkle(legendsSong.bpm), true);
+    stars.animations.play('twinkle', calculateTwinkle(song.bpm), true);
 
     state.planet = new Planet({
         game: state.game,
@@ -69,7 +69,7 @@ const setupStaticGraphics = (state) => {
 };
 
 const playMusic = (state) => {
-    state.music = state.add.audio(legendsSong.id);
+    state.music = state.add.audio(song.id);
     state.musicStartTime = state.game.time.totalElapsedSeconds();
     state.music.play();
 };
@@ -126,7 +126,7 @@ const triggerTap = (state) => {
 
 export default class extends Phaser.State {
     init () {
-        this.beats = legendsSong.ticks;
+        this.beats = song.ticks;
         this.thresholdDistance = 100;
         this.satelliteSpeed = 200;
         this.missCount = 0;
