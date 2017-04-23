@@ -146,6 +146,7 @@ export default class extends Phaser.State {
         this.beats = song.ticks;
         this.thresholdDistance = 100;
         this.satelliteSpeed = 200;
+        this.hitCount = 0;
         this.missCount = 0;
         this.allowSpaceDown = true;
         this.allowPointerDown = true;
@@ -232,11 +233,7 @@ export default class extends Phaser.State {
     }
 
     collisionHandler (threshold, satellite) {
-        if (this.hitcount == undefined) {
-            this.hitcount = 0;
-        } else {
-            this.hitcount++;
-        }
+        this.hitCount++;
 
         // Update orbit
         const orbitGroup = this.orbitGroup;
@@ -251,7 +248,7 @@ export default class extends Phaser.State {
             orbitGroup.add(satellite);
         });
 
-        console.log('thresholdhits: ' + this.hitcount);
+        console.log('thresholdhits: ' + this.hitCount);
     }
 
     getTick () {
