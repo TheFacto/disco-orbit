@@ -3,8 +3,9 @@ import Planet from '../sprites/Planet';
 import Phaser from 'phaser';
 import Threshold from '../sprites/Threshold';
 import { createSatelliteGroup } from '../managers/SattelitesManager';
-import orbitalSong from '../songs/orbital';
 import legendsSong from '../songs/legends';
+
+const ALLOWED_MISSES = 3;
 
 const setupSatelliteGroup = (state) => {
     state.satelliteGroup = createSatelliteGroup(state, state.beats, state.thresholdDistance, state.satelliteSpeed);
@@ -42,17 +43,14 @@ const setupThresholdEnds = (state) => {
 
 const setupThreshold = (state) => {
     const threshold = new Threshold({
-        game: state,
+        game: state.game,
         x: 0,
-        y: state.thresholdDistance,
-        asset: 'threshold_bar'
+        y: state.thresholdDistance
     });
     state.threshold = threshold;
     state.game.add.existing(threshold);
-
     setupThresholdEnds(state);
 };
-
 
 const setupStaticGraphics = (state) => {
     // Background
@@ -61,7 +59,7 @@ const setupStaticGraphics = (state) => {
     stars.animations.play('twinkle', calculateTwinkle(legendsSong.bpm), true);
 
     state.planet = new Planet({
-        game: state,
+        game: state.game,
         x: state.world.centerX,
         y: 50
     });
@@ -74,6 +72,43 @@ const playMusic = (state) => {
     state.music = state.add.audio(legendsSong.id);
     state.musicStartTime = state.game.time.totalElapsedSeconds();
     state.music.play();
+};
+
+const explodePlanet = (state) => {
+    const planetCenter = {
+        x: state.planet.position.x + state.planet.width / 2,
+        y: state.planet.position.y + state.planet.height / 2
+    };
+
+    state.planet.destroy();
+    state.orbitGroup.destroy();
+    state.explosion = state.game.add.sprite(0, 0, 'explosion1');
+
+    const explosionPos = {
+        x: planetCenter.x - state.explosion.width / 2 - 20,
+        y: planetCenter.y - state.explosion.height / 2 - 20
+    };
+
+    state.explosion.position.x = explosionPos.x;
+    state.explosion.position.y = explosionPos.y;
+    state.explosion.animations.add('explode');
+    state.explosion.animations.play('explode', 10, false);
+
+    state.explosionSound = state.add.audio('explosion1');
+    state.explosionSound.play();
+};
+
+const gameOverDetection = (state) => {
+    if (state.missCount >= ALLOWED_MISSES && !state.explosion) {
+        console.log("game over");
+        state.music.stop();
+        explodePlanet(state);
+    }
+
+    if (state.explosion && state.explosion.animations.currentAnim && state.explosion.animations.currentAnim.isFinished) {
+        state.explosion = null;
+        state.state.start('Game');
+    }
 };
 
 export default class extends Phaser.State {
@@ -106,7 +141,7 @@ export default class extends Phaser.State {
         this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
 
         // setup callbacks
-        this.game.input.keyboard.addCallbacks(this, null, this.keyReleased, null);
+        this.game.input.keyboard.addCallbacks(this, this.keyDown, this.keyReleased, null);
 
         this.missText = this.add.text(this.world.centerX, this.world.centerY + 30, 'Miss!', {
             font: '28px Arial',
@@ -118,15 +153,24 @@ export default class extends Phaser.State {
         this.missText.alpha = 0;
     }
 
-    render() {
+    render () {
         //this.game.debug.body(this.threshold);
         //this.satelliteGroup.forEach((a) => {
         //    this.game.debug.body(a)
         //});
     }
 
-    keyReleased(key) {
-        if (key.code == "Space") {
+    keyDown (key) {
+        switch (key.code) {
+            case 'Space':
+                this.threshold.animations.play('pressed');
+                break;
+        }
+    }
+
+    keyReleased (key) {
+        if (key.code == 'Space') {
+            this.threshold.animations.play('inactive');
             if (this.game.physics.arcade.collide(this.threshold, this.satelliteGroup, this.collisionHandler, this.processHandler, this)) {
 
             } else {
@@ -134,6 +178,7 @@ export default class extends Phaser.State {
                 console.log("misscount: " + this.missCount);
                 this.missText.alpha = 1;
                 this.game.add.tween(this.missText).to({alpha: 0}, 500, Phaser.Easing.Linear.None, true);
+                this.planet.updateHealth(ALLOWED_MISSES - this.missCount);
             }
         }
     }
@@ -144,17 +189,14 @@ export default class extends Phaser.State {
         this.satelliteGroup.position.y -= this.satelliteSpeed * delta;
         this.lastFrameTime = this.game.time.totalElapsedSeconds();
 
-        if (this.missCount >= 3) {
-            console.log("game over");
-            this.game.gamePaused();
-        }
+        gameOverDetection(this);
     }
 
-    processHandler(threshold, satellite) {
+    processHandler (threshold, satellite) {
         return true;
     }
 
-    collisionHandler(threshold, satellite) {
+    collisionHandler (threshold, satellite) {
         if (this.hitcount == undefined) {
             this.hitcount = 0;
         } else {
@@ -162,7 +204,7 @@ export default class extends Phaser.State {
         }
 
         if (this.spaceKey || this.game.input.activePointer.isDown) {
-            console.log("spacebar pressed while in threshold zone");
+            console.log('spacebar pressed while in threshold zone');
 
             // Update orbit
             const orbitGroup = this.orbitGroup;
@@ -177,11 +219,11 @@ export default class extends Phaser.State {
                 orbitGroup.add(satellite);
             });
 
-            console.log("thresholdhits: " + this.hitcount);
+            console.log('thresholdhits: ' + this.hitcount);
         }
     }
 
-    getTick() {
+    getTick () {
         return this.game.time.totalElapsedSeconds() - this.musicStartTime;
     }
 }

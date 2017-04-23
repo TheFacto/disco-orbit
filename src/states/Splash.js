@@ -16,19 +16,21 @@ export default class extends Phaser.State {
         //
         // load your assets
         //
-        this.load.image('mushroom', 'assets/images/mushroom2.png');
-        this.load.image('threshold', 'assets/images/threshold.png');
-        this.load.image('planet', 'assets/images/planet.png');
-        this.load.image('planet_01', 'assets/images/planets/planet_01.png');
         this.load.audio(orbitalSong.id, [`assets/music/${orbitalSong.asset}`]);
         this.load.audio(legendsSong.id, [`assets/music/${legendsSong.asset}`]);
-        // this.load.image('starry_night', 'assets/images/backgrounds/starry_night.png');
+        this.load.audio('explosion1', ['assets/sounds/Explosion1.ogg']);
+        this.load.spritesheet('explosion1', 'assets/images/spritesheets/explosion1.png', 128, 128, 14);
 
         // Threshold
         this.load.image('threshold_bar', 'assets/images/threshold/threshold_bar.png');
+        this.load.spritesheet('threshold_sprite', 'assets/images/threshold/threshold_bar_animated.png', 32, 32);
         this.load.spritesheet('threshold_end', 'assets/images/threshold/threshold_end.png', 32, 32);
         this.load.spritesheet('starry_night', 'assets/images/backgrounds/starry_night.png', 64, 64);
 
+        // Planet
+        this.load.spritesheet('planet_01', 'assets/images/planets/planet_01.png', 32, 32);
+
+        // Satellites
         satellites.forEach((s) => {
             this.load.image(s.id, `assets/images/satellites/${s.asset}`);
         });
