@@ -107,6 +107,15 @@ export default class extends Phaser.State {
 
         // setup callbacks
         this.game.input.keyboard.addCallbacks(this, null, this.keyReleased, null);
+
+        this.missText = this.add.text(this.world.centerX, this.world.centerY + 30, 'Miss!', {
+            font: '28px Arial',
+            fill: '#dddddd',
+            align: 'center'
+        });
+        this.missText.anchor.setTo(0.5, 0.5);
+
+        this.missText.alpha = 0;
     }
 
     render() {
@@ -123,6 +132,8 @@ export default class extends Phaser.State {
             } else {
                 this.missCount++;
                 console.log("misscount: " + this.missCount);
+                this.missText.alpha = 1;
+                this.game.add.tween(this.missText).to({alpha: 0}, 500, Phaser.Easing.Linear.None, true);
             }
         }
     }
