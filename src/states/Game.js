@@ -5,10 +5,45 @@ import Threshold from '../sprites/Threshold';
 import { createSatelliteGroup } from '../managers/SattelitesManager';
 import orbitalSong from '../songs/orbital';
 
+const setupSatelliteGroup = (state) => {
+    state.satelliteGroup = createSatelliteGroup(state, state.beats, state.thresholdDistance, state.satelliteSpeed);
+    state.satelliteGroup.position.y = 40;
+
+    state.game.add.existing(state.satelliteGroup);
+    state.game.physics.arcade.enable(state.satelliteGroup);
+
+    // add physics to group
+    state.satelliteGroup.enableBody = true;
+    state.satelliteGroup.enableBodyDebug = true;
+    state.satelliteGroup.physicsBodyType = Phaser.Physics.Arcade;
+};
+
+const setupStaticGraphics = (state) => {
+    state.planet = new Planet({
+        game: state,
+        x: state.world.centerX,
+        y: 100
+    });
+    state.threshold = new Threshold({
+        game: state,
+        x: 0,
+        y: state.thresholdDistance,  // TODO: Calculate actual placement
+        asset: 'threshold'
+    });
+    state.game.add.existing(state.planet);
+    state.game.add.existing(state.threshold);
+};
+
+const playMusic = (state) => {
+    state.music = state.add.audio(orbitalSong.id);
+    state.musicStartTime = state.game.time.totalElapsedSeconds();
+    state.music.play();
+};
+
 export default class extends Phaser.State {
     init () {
         this.beats = orbitalSong.ticks;
-        this.thresholdDistance = this.world.width - 300;
+        this.thresholdDistance = 250;
         this.satelliteSpeed = 200;
     }
 
@@ -17,41 +52,9 @@ export default class extends Phaser.State {
     }
 
     create () {
-        this.debugText = this.game.add.text(this.world.centerX, this.world.centerY, "test");
-        this.planet = new Planet({
-            game: this,
-            x: this.world.width - 150,
-            y: this.world.centerY
-        });
-        this.threshold = new Threshold({
-            game: this,
-            x: this.thresholdDistance,  // TODO: Calculate actual placement
-            y: this.world.centerY,
-            asset: 'threshold'
-        });
-
-        this.music = this.add.audio(orbitalSong.id);
-        this.musicStartTime = this.game.time.totalElapsedSeconds();
-        this.music.play();
-        this.game.add.existing(this.planet);
-        this.game.add.existing(this.threshold);
-
-        const secondsPerBeat = (60 / orbitalSong.bpm) * 1000;
-        this.beatCount = 0;
-        /*this.time.events.loop(secondsPerBeat, () => {
-            console.log(`Beat: ${this.beatCount}`);
-            // Give 4 beats buffer
-            if(this.beatCount === 4) {
-                this.musicStartTime = this.game.time.totalElapsedSeconds();
-                this.music.play();
-            }
-            this.beatCount++;
-        }, this); */
-
-        // Satellite Group
-        this.satelliteGroup = createSatelliteGroup(this, this.beats, this.thresholdDistance, this.satelliteSpeed);
-        this.satelliteGroup.position.x = -45;
-        this.game.add.existing(this.satelliteGroup);
+        setupStaticGraphics(this);
+        setupSatelliteGroup(this);
+        playMusic(this);
 
         // Orbit Group
         this.orbitGroup = new Phaser.Group(this.game);
@@ -62,12 +65,7 @@ export default class extends Phaser.State {
         // set-up the physics bodies
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.physics.arcade.enable(this.threshold);
-        this.game.physics.arcade.enable(this.satelliteGroup);
 
-        // add physics to group
-        this.satelliteGroup.enableBody = true;
-        this.satelliteGroup.enableBodyDebug = true;
-        this.satelliteGroup.physicsBodyType = Phaser.Physics.Arcade;
     }
 
     render() {
@@ -79,10 +77,8 @@ export default class extends Phaser.State {
 
     update () {
         // Update satellite group
-        this.debugText.setText(this.getTick());
         const delta = this.game.time.totalElapsedSeconds() - this.lastFrameTime;
-        this.satelliteGroup.position.x += this.satelliteSpeed * delta;
-
+        this.satelliteGroup.position.y -= this.satelliteSpeed * delta;
         this.lastFrameTime = this.game.time.totalElapsedSeconds();
 
         if (this.game.physics.arcade.collide(this.threshold, this.satelliteGroup, this.collisionHandler, this.processHandler, this)) {

@@ -12,6 +12,7 @@ export default class Satellite extends Phaser.Sprite {
     enterOrbit(orbitAround) {
         this.isOrbiting = true;
         this.pivot.x = (orbitAround.width + 10);
+        this.pivot.y = orbitAround.height + 10;
 
         // Hook to the position
         this.position.x = orbitAround.position.x;
