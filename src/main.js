@@ -12,7 +12,6 @@ import { scaleFactor } from './utils';
 class Game extends Phaser.Game {
     constructor () {
         const docElement = document.documentElement;
-        debugger;
         const width = docElement.clientWidth / scaleFactor();
         const height = docElement.clientHeight / scaleFactor();
 
