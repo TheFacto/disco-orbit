@@ -27,6 +27,32 @@ const calculateTwinkle = (bpm) => {
     return (bpm / 60);
 };
 
+const setupThresholdEnds = (state) => {
+    const end01 = state.add.sprite(16, state.thresholdDistance, 'threshold_end');
+    end01.anchor.setTo(0.5);
+    end01.animations.add('pulse');
+    end01.animations.play('pulse', calculateTwinkle(orbitalSong.bpm), true);
+
+    const end02 = state.add.sprite(state.world.width - 16, state.thresholdDistance, 'threshold_end');
+    end02.anchor.setTo(0.5);
+    end02.animations.add('pulse');
+    end02.animations.play('pulse', calculateTwinkle(orbitalSong.bpm), true);
+};
+
+const setupThreshold = (state) => {
+    const threshold = new Threshold({
+        game: state,
+        x: 0,
+        y: state.thresholdDistance,
+        asset: 'threshold_bar'
+    });
+    state.threshold = threshold;
+    state.game.add.existing(threshold);
+
+    setupThresholdEnds(state);
+};
+
+
 const setupStaticGraphics = (state) => {
     // Background
     const stars = state.add.tileSprite(0, 0, state.game.world.width, state.game.world.height, 'starry_night');
@@ -38,12 +64,7 @@ const setupStaticGraphics = (state) => {
         x: state.world.centerX,
         y: 50
     });
-    state.threshold = new Threshold({
-        game: state,
-        x: 0,
-        y: state.thresholdDistance,  // TODO: Calculate actual placement
-        asset: 'threshold'
-    });
+    setupThreshold(state);
     state.game.add.existing(state.planet);
     state.game.add.existing(state.threshold);
 };
