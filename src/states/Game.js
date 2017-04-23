@@ -4,6 +4,7 @@ import Phaser from 'phaser';
 import Threshold from '../sprites/Threshold';
 import { createSatelliteGroup } from '../managers/SattelitesManager';
 import orbitalSong from '../songs/orbital';
+import legendsSong from '../songs/legends';
 
 const setupSatelliteGroup = (state) => {
     state.satelliteGroup = createSatelliteGroup(state, state.beats, state.thresholdDistance, state.satelliteSpeed);
@@ -31,12 +32,12 @@ const setupThresholdEnds = (state) => {
     const end01 = state.add.sprite(16, state.thresholdDistance, 'threshold_end');
     end01.anchor.setTo(0.5);
     end01.animations.add('pulse');
-    end01.animations.play('pulse', calculateTwinkle(orbitalSong.bpm), true);
+    end01.animations.play('pulse', calculateTwinkle(legendsSong.bpm), true);
 
     const end02 = state.add.sprite(state.world.width - 16, state.thresholdDistance, 'threshold_end');
     end02.anchor.setTo(0.5);
     end02.animations.add('pulse');
-    end02.animations.play('pulse', calculateTwinkle(orbitalSong.bpm), true);
+    end02.animations.play('pulse', calculateTwinkle(legendsSong.bpm), true);
 };
 
 const setupThreshold = (state) => {
@@ -57,7 +58,7 @@ const setupStaticGraphics = (state) => {
     // Background
     const stars = state.add.tileSprite(0, 0, state.game.world.width, state.game.world.height, 'starry_night');
     stars.animations.add('twinkle');
-    stars.animations.play('twinkle', calculateTwinkle(orbitalSong.bpm), true);
+    stars.animations.play('twinkle', calculateTwinkle(legendsSong.bpm), true);
 
     state.planet = new Planet({
         game: state,
@@ -70,14 +71,14 @@ const setupStaticGraphics = (state) => {
 };
 
 const playMusic = (state) => {
-    state.music = state.add.audio(orbitalSong.id);
+    state.music = state.add.audio(legendsSong.id);
     state.musicStartTime = state.game.time.totalElapsedSeconds();
     state.music.play();
 };
 
 export default class extends Phaser.State {
     init () {
-        this.beats = orbitalSong.ticks;
+        this.beats = legendsSong.ticks;
         this.thresholdDistance = 100;
         this.satelliteSpeed = 200;
         this.missCount = 0;

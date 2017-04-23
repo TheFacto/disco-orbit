@@ -11,4 +11,6 @@ const retrieveTimes = (filePath) =>
       .filter((event) => event.subtype == 9)
       .map((event) => event.playTime / 1000);
 
+fs.writeFileSync("./song.json", JSON.stringify(retrieveTimes(process.argv[2])));
+
 console.log(retrieveTimes(process.argv[2]));
