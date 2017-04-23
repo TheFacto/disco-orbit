@@ -118,6 +118,11 @@ const gameOverDetection = (state) => {
     }
 };
 
+const displayMissText = (state) => {
+    state.missText.alpha = 1;
+    state.game.add.tween(state.missText).to({alpha: 0}, 500, Phaser.Easing.Linear.None, true);
+}
+
 const triggerTap = (state) => {
     state.threshold.animations.play('pressed');
     setTimeout(() => state.threshold.animations.play('inactive'), 100);
@@ -126,8 +131,7 @@ const triggerTap = (state) => {
     };
     state.missCount++;
     console.log("misscount: " + state.missCount);
-    state.missText.alpha = 1;
-    state.game.add.tween(state.missText).to({alpha: 0}, 500, Phaser.Easing.Linear.None, true);
+    displayMissText(state);
     state.planet.updateHealth(ALLOWED_MISSES - state.missCount);
 };
 
@@ -136,6 +140,7 @@ const flyByMissDetection = (state) => {
         if (s.body.y < state.threshold.position.y - state.threshold.height && s.missed == false) {
             s.missed = true;
             state.missCount++;
+            displayMissText(state);
             console.log("exceeded threshold");
         }
     });
