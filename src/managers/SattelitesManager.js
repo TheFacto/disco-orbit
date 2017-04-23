@@ -1,6 +1,9 @@
 import Satellite from '../sprites/Satellite';
 import { getRandomInt } from '../utils';
 import Phaser from 'phaser';
+import satellites from '../satellites/satellites';
+
+const randomAsset = () => satellites[Math.floor(Math.random() * satellites.length)];
 
 const createSatellites = (game, beats, thresholdX, speed) =>
     beats.map(
@@ -8,7 +11,7 @@ const createSatellites = (game, beats, thresholdX, speed) =>
             game: game,
             y: thresholdX + beat * speed,
             x: getRandomInt(0, game.world.width),
-            asset: 'mushroom',
+            asset: randomAsset().id,
             speed: 0
         })
     );

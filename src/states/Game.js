@@ -18,11 +18,25 @@ const setupSatelliteGroup = (state) => {
     state.satelliteGroup.physicsBodyType = Phaser.Physics.Arcade;
 };
 
+const setupOrbitalGroup = (state) => {
+    state.orbitGroup = new Phaser.Group(state);
+    state.game.add.existing(state.orbitGroup);
+};
+
+const calculateTwinkle = (bpm) => {
+    return (bpm / 60);
+};
+
 const setupStaticGraphics = (state) => {
+    // Background
+    const stars = state.add.tileSprite(0, 0, state.game.world.width, state.game.world.height, 'starry_night');
+    stars.animations.add('twinkle');
+    stars.animations.play('twinkle', calculateTwinkle(orbitalSong.bpm), true);
+
     state.planet = new Planet({
         game: state,
         x: state.world.centerX,
-        y: 100
+        y: 50
     });
     state.threshold = new Threshold({
         game: state,
@@ -43,7 +57,7 @@ const playMusic = (state) => {
 export default class extends Phaser.State {
     init () {
         this.beats = orbitalSong.ticks;
-        this.thresholdDistance = 250;
+        this.thresholdDistance = 100;
         this.satelliteSpeed = 200;
     }
 
@@ -54,11 +68,8 @@ export default class extends Phaser.State {
     create () {
         setupStaticGraphics(this);
         setupSatelliteGroup(this);
+        setupOrbitalGroup(this);
         playMusic(this);
-
-        // Orbit Group
-        this.orbitGroup = new Phaser.Group(this.game);
-        this.game.add.existing(this.orbitGroup);
 
         this.lastFrameTime = this.game.time.totalElapsedSeconds();
 

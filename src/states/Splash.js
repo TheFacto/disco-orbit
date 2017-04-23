@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { centerGameObjects } from '../utils';
+import satellites from "../satellites/satellites";
 
 export default class extends Phaser.State {
     init () {}
@@ -17,6 +18,13 @@ export default class extends Phaser.State {
         this.load.image('threshold', 'assets/images/threshold.png');
         this.load.image('planet', 'assets/images/planet.png');
         this.load.image('planet_01', 'assets/images/planets/planet_01.png');
+        // this.load.image('starry_night', 'assets/images/backgrounds/starry_night.png');
+
+        this.load.spritesheet('starry_night', 'assets/images/backgrounds/starry_night.png', 64, 64);
+
+        satellites.forEach((s) => {
+            this.load.image(s.id, `assets/images/satellites/${s.asset}`);
+        });
     }
 
     create () {
