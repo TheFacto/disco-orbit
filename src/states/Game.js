@@ -111,12 +111,27 @@ const gameOverDetection = (state) => {
     }
 };
 
+const triggerTap = (state) => {
+    state.threshold.animations.play('pressed');
+    setTimeout(() => state.threshold.animations.play('inactive'), 100);
+    if (state.game.physics.arcade.collide(state.threshold, state.satelliteGroup, state.collisionHandler, state.processHandler, state)) {
+        return;
+    };
+    state.missCount++;
+    console.log("misscount: " + state.missCount);
+    state.missText.alpha = 1;
+    state.game.add.tween(state.missText).to({alpha: 0}, 500, Phaser.Easing.Linear.None, true);
+    state.planet.updateHealth(ALLOWED_MISSES - state.missCount);
+};
+
 export default class extends Phaser.State {
     init () {
         this.beats = legendsSong.ticks;
         this.thresholdDistance = 100;
         this.satelliteSpeed = 200;
         this.missCount = 0;
+        this.allowSpaceDown = true;
+        this.allowPointerDown = true;
     }
 
     preload () {
@@ -161,25 +176,15 @@ export default class extends Phaser.State {
     }
 
     keyDown (key) {
-        switch (key.code) {
-            case 'Space':
-                this.threshold.animations.play('pressed');
-                break;
+        if (key.code == 'Space' && this.allowSpaceDown) {
+            this.allowKeyDown = false;
+            triggerTap(this);
         }
     }
 
     keyReleased (key) {
         if (key.code == 'Space') {
-            this.threshold.animations.play('inactive');
-            if (this.game.physics.arcade.collide(this.threshold, this.satelliteGroup, this.collisionHandler, this.processHandler, this)) {
-
-            } else {
-                this.missCount++;
-                console.log("misscount: " + this.missCount);
-                this.missText.alpha = 1;
-                this.game.add.tween(this.missText).to({alpha: 0}, 500, Phaser.Easing.Linear.None, true);
-                this.planet.updateHealth(ALLOWED_MISSES - this.missCount);
-            }
+            this.allowKeyDown = true;
         }
     }
 
@@ -188,6 +193,15 @@ export default class extends Phaser.State {
         const delta = this.game.time.totalElapsedSeconds() - this.lastFrameTime;
         this.satelliteGroup.position.y -= this.satelliteSpeed * delta;
         this.lastFrameTime = this.game.time.totalElapsedSeconds();
+
+        if (this.game.input.activePointer.isDown && this.allowPointerDown) {
+            triggerTap(this);
+            this.allowPointerDown = false;
+        }
+
+        if (this.game.input.activePointer.isUp) {
+            this.allowPointerDown = true;
+        }
 
         gameOverDetection(this);
     }
@@ -203,24 +217,20 @@ export default class extends Phaser.State {
             this.hitcount++;
         }
 
-        if (this.spaceKey || this.game.input.activePointer.isDown) {
-            console.log('spacebar pressed while in threshold zone');
+        // Update orbit
+        const orbitGroup = this.orbitGroup;
+        const planet = this.planet;
+        const satGroup = this.satelliteGroup;
+        const toRemove = [];
+        toRemove.push(satellite);
 
-            // Update orbit
-            const orbitGroup = this.orbitGroup;
-            const planet = this.planet;
-            const satGroup = this.satelliteGroup;
-            const toRemove = [];
-            toRemove.push(satellite);
+        toRemove.forEach((satellite) => {
+            satGroup.remove(satellite);
+            satellite.enterOrbit(planet);
+            orbitGroup.add(satellite);
+        });
 
-            toRemove.forEach((satellite) => {
-                satGroup.remove(satellite);
-                satellite.enterOrbit(planet);
-                orbitGroup.add(satellite);
-            });
-
-            console.log('thresholdhits: ' + this.hitcount);
-        }
+        console.log('thresholdhits: ' + this.hitcount);
     }
 
     getTick () {
