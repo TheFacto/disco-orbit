@@ -7,14 +7,16 @@ import SplashState from './states/Splash';
 import GameState from './states/Game';
 
 import config from './config';
+import { scaleFactor } from './utils';
 
 class Game extends Phaser.Game {
     constructor () {
         const docElement = document.documentElement;
-        const width = docElement.clientWidth / 4;
-        const height = docElement.clientHeight / 4;
+        debugger;
+        const width = docElement.clientWidth / scaleFactor();
+        const height = docElement.clientHeight / scaleFactor();
 
-        super(width, height, Phaser.CANVAS, 'content', null);
+        super(width, height, Phaser.AUTO, 'content', null);
 
         this.state.add('Boot', BootState, false);
         this.state.add('Splash', SplashState, false);

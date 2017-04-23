@@ -83,7 +83,6 @@ export default class extends Phaser.State {
     }
 
     preload () {
-        this.load.audio(orbitalSong.id, [`assets/music/${orbitalSong.asset}`]);
     }
 
     create () {
@@ -129,7 +128,7 @@ export default class extends Phaser.State {
             this.hitcount++;
         }
 
-        if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+        if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || this.game.input.activePointer.isDown) {
             console.log("spacebar pressed while in threshold zone");
 
             // Update orbit

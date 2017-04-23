@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { centerGameObjects } from '../utils';
 import satellites from "../satellites/satellites";
+import orbitalSong from '../songs/orbital';
 
 export default class extends Phaser.State {
     init () {}
@@ -18,6 +19,7 @@ export default class extends Phaser.State {
         this.load.image('threshold', 'assets/images/threshold.png');
         this.load.image('planet', 'assets/images/planet.png');
         this.load.image('planet_01', 'assets/images/planets/planet_01.png');
+        this.load.audio(orbitalSong.id, [`assets/music/${orbitalSong.asset}`]);
         // this.load.image('starry_night', 'assets/images/backgrounds/starry_night.png');
 
         // Threshold
@@ -31,6 +33,9 @@ export default class extends Phaser.State {
     }
 
     create () {
-        this.state.start('Game');
+        this.game.add.text(0, this.game.world.centerY - 10, "Loading...", { font: "20px Arial" });
+        this.sound.setDecodedCallback([ orbitalSong.id ] , () => {
+            this.state.start('Game');
+        }, this);
     }
 }
