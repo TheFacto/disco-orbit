@@ -4,13 +4,19 @@ import Phaser from 'phaser';
 import satellites from '../satellites/satellites';
 
 const randomAsset = () => satellites[Math.floor(Math.random() * satellites.length)];
+const getSpawnPoints = (game) =>
+    ([
+        (game.world.width / 2) - 16,
+        (game.world.width / 2),
+        (game.world.width / 2) + 16
+    ]);
 
 const createSatellites = (game, beats, thresholdX, speed) =>
     beats.map(
         (beat) => new Satellite({
             game: game,
             y: thresholdX + beat * speed,
-            x: getRandomInt(0, game.world.width),
+            x: getSpawnPoints(game)[getRandomInt(0, 3)],
             asset: randomAsset().id,
             speed: 0
         })
