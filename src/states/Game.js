@@ -7,6 +7,7 @@ import song from '../songs/planets';
 
 const ALLOWED_MISSES = 3;
 const SATELLITE_BOUNDING_BOX_Y_OFFSET = -7;
+const DEBUG_MODE = false;
 
 const setupSatelliteGroup = (state) => {
     state.satelliteGroup = createSatelliteGroup(state, state.beats, state.thresholdDistance, state.satelliteSpeed);
@@ -20,7 +21,7 @@ const setupSatelliteGroup = (state) => {
     state.satelliteGroup.enableBodyDebug = true;
     state.satelliteGroup.physicsBodyType = Phaser.Physics.Arcade;
 
-    // temp fix for collision bounds
+    // modify bounding box on satellite
     state.satelliteGroup.forEach((s) => {
         s.body.setSize(s.body.width, s.body.height, 0, SATELLITE_BOUNDING_BOX_Y_OFFSET);
     });
@@ -185,11 +186,13 @@ export default class extends Phaser.State {
     }
 
     render () {
-        this.game.debug.body(this.threshold);
-        this.game.debug.body(this.planet);
-        this.satelliteGroup.forEach((a) => {
-            this.game.debug.body(a)
-        });
+        if (DEBUG_MODE) {
+            this.game.debug.body(this.threshold);
+            this.game.debug.body(this.planet);
+            this.satelliteGroup.forEach((a) => {
+                this.game.debug.body(a)
+            });
+        }
     }
 
     keyDown (key) {
