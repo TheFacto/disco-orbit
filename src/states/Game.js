@@ -80,6 +80,7 @@ export default class extends Phaser.State {
         this.beats = orbitalSong.ticks;
         this.thresholdDistance = 100;
         this.satelliteSpeed = 200;
+        this.missCount = 0;
     }
 
     preload () {
@@ -97,6 +98,14 @@ export default class extends Phaser.State {
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.physics.arcade.enable(this.threshold);
 
+        // register the enter key
+        this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+
+        // stop this key from propagating up to the browser
+        this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
+
+        // setup callbacks
+        this.game.input.keyboard.addCallbacks(this, null, this.keyReleased, null);
     }
 
     render() {
@@ -106,14 +115,26 @@ export default class extends Phaser.State {
         //});
     }
 
+    keyReleased(key) {
+        if (key.code == "Space") {
+            if (this.game.physics.arcade.collide(this.threshold, this.satelliteGroup, this.collisionHandler, this.processHandler, this)) {
+
+            } else {
+                this.missCount++;
+                console.log("misscount: " + this.missCount);
+            }
+        }
+    }
+
     update () {
         // Update satellite group
         const delta = this.game.time.totalElapsedSeconds() - this.lastFrameTime;
         this.satelliteGroup.position.y -= this.satelliteSpeed * delta;
         this.lastFrameTime = this.game.time.totalElapsedSeconds();
 
-        if (this.game.physics.arcade.collide(this.threshold, this.satelliteGroup, this.collisionHandler, this.processHandler, this)) {
-
+        if (this.missCount >= 3) {
+            console.log("game over");
+            this.game.gamePaused();
         }
     }
 
@@ -128,7 +149,7 @@ export default class extends Phaser.State {
             this.hitcount++;
         }
 
-        if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || this.game.input.activePointer.isDown) {
+        if (this.spaceKey || this.game.input.activePointer.isDown) {
             console.log("spacebar pressed while in threshold zone");
 
             // Update orbit
@@ -143,9 +164,9 @@ export default class extends Phaser.State {
                 satellite.enterOrbit(planet);
                 orbitGroup.add(satellite);
             });
-        }
 
-        //console.log("hitcount: " + this.hitcount);
+            console.log("thresholdhits: " + this.hitcount);
+        }
     }
 
     getTick() {
