@@ -76,6 +76,43 @@ const playMusic = (state) => {
     state.music.play();
 };
 
+const explodePlanet = (state) => {
+    const planetCenter = {
+        x: state.planet.position.x + state.planet.width / 2,
+        y: state.planet.position.y + state.planet.height / 2
+    };
+
+    state.planet.destroy();
+    state.orbitGroup.destroy();
+    state.explosion = state.game.add.sprite(0, 0, 'explosion1');
+
+    const explosionPos = {
+        x: planetCenter.x - state.explosion.width / 2 - 20,
+        y: planetCenter.y - state.explosion.height / 2 - 20
+    };
+
+    state.explosion.position.x = explosionPos.x;
+    state.explosion.position.y = explosionPos.y;
+    state.explosion.animations.add('explode');
+    state.explosion.animations.play('explode', 10, false);
+
+    state.explosionSound = state.add.audio('explosion1');
+    state.explosionSound.play();
+};
+
+const gameOverDetection = (state) => {
+    if (state.missCount >= 3 && !state.explosion) {
+        console.log("game over");
+        state.music.stop();
+        explodePlanet(state);
+    }
+
+    if (state.explosion && state.explosion.animations.currentAnim && state.explosion.animations.currentAnim.isFinished) {
+        state.explosion = null;
+        state.state.start('Game');
+    }
+};
+
 export default class extends Phaser.State {
     init () {
         this.beats = legendsSong.ticks;
@@ -133,10 +170,7 @@ export default class extends Phaser.State {
         this.satelliteGroup.position.y -= this.satelliteSpeed * delta;
         this.lastFrameTime = this.game.time.totalElapsedSeconds();
 
-        if (this.missCount >= 3) {
-            console.log("game over");
-            this.game.gamePaused();
-        }
+        gameOverDetection(this);
     }
 
     processHandler(threshold, satellite) {
