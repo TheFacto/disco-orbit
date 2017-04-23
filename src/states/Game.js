@@ -5,6 +5,8 @@ import Threshold from '../sprites/Threshold';
 import { createSatelliteGroup } from '../managers/SattelitesManager';
 import legendsSong from '../songs/legends';
 
+const ALLOWED_MISSES = 3;
+
 const setupSatelliteGroup = (state) => {
     state.satelliteGroup = createSatelliteGroup(state, state.beats, state.thresholdDistance, state.satelliteSpeed);
     state.satelliteGroup.position.y = 0;
@@ -57,7 +59,7 @@ const setupStaticGraphics = (state) => {
     stars.animations.play('twinkle', calculateTwinkle(legendsSong.bpm), true);
 
     state.planet = new Planet({
-        game: state,
+        game: state.game,
         x: state.world.centerX,
         y: 50
     });
@@ -97,7 +99,7 @@ const explodePlanet = (state) => {
 };
 
 const gameOverDetection = (state) => {
-    if (state.missCount >= 3 && !state.explosion) {
+    if (state.missCount >= ALLOWED_MISSES && !state.explosion) {
         console.log("game over");
         state.music.stop();
         explodePlanet(state);
@@ -176,6 +178,7 @@ export default class extends Phaser.State {
                 console.log("misscount: " + this.missCount);
                 this.missText.alpha = 1;
                 this.game.add.tween(this.missText).to({alpha: 0}, 500, Phaser.Easing.Linear.None, true);
+                this.planet.updateHealth(ALLOWED_MISSES - this.missCount);
             }
         }
     }
