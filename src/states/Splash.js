@@ -14,21 +14,32 @@ export default class extends Phaser.State {
 
         this.load.setPreloadSprite(this.loaderBar);
         //
-        // load your assets
+        // Audio
         //
         this.load.audio(orbitalSong.id, [`assets/music/${orbitalSong.asset}`]);
         this.load.audio(legendsSong.id, [`assets/music/${legendsSong.asset}`]);
         this.load.audio('explosion1', ['assets/sounds/Explosion1.ogg']);
-        this.load.spritesheet('explosion1', 'assets/images/spritesheets/explosion1.png', 128, 128, 14);
 
-        // Threshold
+        //
+        // Images
+        //
         this.load.image('threshold_bar', 'assets/images/threshold/threshold_bar.png');
+
+        //
+        // SpriteShits
+        //
         this.load.spritesheet('threshold_sprite', 'assets/images/threshold/threshold_bar_animated.png', 32, 32);
         this.load.spritesheet('threshold_end', 'assets/images/threshold/threshold_end.png', 32, 32);
         this.load.spritesheet('starry_night', 'assets/images/backgrounds/starry_night.png', 64, 64);
-
-        // Planet
         this.load.spritesheet('planet_01', 'assets/images/planets/planet_01.png', 32, 32);
+        this.load.spritesheet('explosion1', 'assets/images/spritesheets/explosion1.png', 128, 128, 14);
+
+        //
+        // Fonts
+        //
+        this.load.bitmapFont('pixelfont-medium', 'assets/fonts/bitmap/PressStart2P-32-graywhite.png', 'assets/fonts/bitmap/PressStart2P-32-graywhite.fnt');
+
+        this.load.bitmapFont('pixelfont-small', 'assets/fonts/bitmap/PressStart2P-8-graywhite.png', 'assets/fonts/bitmap/PressStart2P-8-graywhite.fnt');
 
         // Satellites
         satellites.forEach((s) => {
@@ -39,7 +50,7 @@ export default class extends Phaser.State {
     create () {
         this.game.add.text(0, this.game.world.centerY - 10, "Loading...", { font: "20px Arial" });
         this.sound.setDecodedCallback([ legendsSong.id ] , () => {
-            this.state.start('Game');
+            this.state.start('Instructions');
         }, this);
     }
 }
