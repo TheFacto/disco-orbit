@@ -9,6 +9,7 @@ export default class Satellite extends Phaser.Sprite {
         // this.scale.setTo(0.5, 0.5);
         this.anchor.setTo(0.5);
         this.isOrbiting = false;
+        this.missed = false;
     }
 
     enterOrbit(orbitAround) {

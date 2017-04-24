@@ -6,6 +6,8 @@ import { createSatelliteGroup } from '../managers/SattelitesManager';
 import song from '../songs/planets';
 
 const ALLOWED_MISSES = 3;
+const SATELLITE_BOUNDING_BOX_Y_OFFSET = -7;
+const DEBUG_MODE = false;
 
 const setupSatelliteGroup = (state) => {
     state.satelliteGroup = createSatelliteGroup(state, state.beats, state.thresholdDistance, state.satelliteSpeed);
@@ -18,6 +20,11 @@ const setupSatelliteGroup = (state) => {
     state.satelliteGroup.enableBody = true;
     state.satelliteGroup.enableBodyDebug = true;
     state.satelliteGroup.physicsBodyType = Phaser.Physics.Arcade;
+
+    // modify bounding box on satellite
+    state.satelliteGroup.forEach((s) => {
+        s.body.setSize(s.body.width, s.body.height, 0, SATELLITE_BOUNDING_BOX_Y_OFFSET);
+    });
 };
 
 const setupOrbitalGroup = (state) => {
@@ -111,6 +118,11 @@ const gameOverDetection = (state) => {
     }
 };
 
+const displayMissText = (state) => {
+    state.missText.alpha = 1;
+    state.game.add.tween(state.missText).to({alpha: 0}, 500, Phaser.Easing.Linear.None, true);
+}
+
 const triggerTap = (state) => {
     state.threshold.animations.play('pressed');
     setTimeout(() => state.threshold.animations.play('inactive'), 100);
@@ -119,16 +131,27 @@ const triggerTap = (state) => {
     };
     state.missCount++;
     console.log("misscount: " + state.missCount);
-    state.missText.alpha = 1;
-    state.game.add.tween(state.missText).to({alpha: 0}, 500, Phaser.Easing.Linear.None, true);
+    displayMissText(state);
     state.planet.updateHealth(ALLOWED_MISSES - state.missCount);
 };
+
+const flyByMissDetection = (state) => {
+    state.satelliteGroup.forEach((s) => {
+        if (s.body.y < state.threshold.position.y - state.threshold.height && s.missed == false) {
+            s.missed = true;
+            state.missCount++;
+            displayMissText(state);
+            console.log("exceeded threshold");
+        }
+    });
+}
 
 export default class extends Phaser.State {
     init () {
         this.beats = song.ticks;
         this.thresholdDistance = 100;
         this.satelliteSpeed = 200;
+        this.hitCount = 0;
         this.missCount = 0;
         this.allowSpaceDown = true;
         this.allowPointerDown = true;
@@ -169,10 +192,13 @@ export default class extends Phaser.State {
     }
 
     render () {
-        //this.game.debug.body(this.threshold);
-        //this.satelliteGroup.forEach((a) => {
-        //    this.game.debug.body(a)
-        //});
+        if (DEBUG_MODE) {
+            this.game.debug.body(this.threshold);
+            this.game.debug.body(this.planet);
+            this.satelliteGroup.forEach((a) => {
+                this.game.debug.body(a)
+            });
+        }
     }
 
     keyDown (key) {
@@ -203,6 +229,7 @@ export default class extends Phaser.State {
             this.allowPointerDown = true;
         }
 
+        flyByMissDetection(this);
         gameOverDetection(this);
     }
 
@@ -211,11 +238,7 @@ export default class extends Phaser.State {
     }
 
     collisionHandler (threshold, satellite) {
-        if (this.hitcount == undefined) {
-            this.hitcount = 0;
-        } else {
-            this.hitcount++;
-        }
+        this.hitCount++;
 
         // Update orbit
         const orbitGroup = this.orbitGroup;
@@ -230,7 +253,7 @@ export default class extends Phaser.State {
             orbitGroup.add(satellite);
         });
 
-        console.log('thresholdhits: ' + this.hitcount);
+        console.log('thresholdhits: ' + this.hitCount);
     }
 
     getTick () {
