@@ -36,7 +36,7 @@ export default class extends Phaser.State {
     create () {
         this.game.add.text(0, this.game.world.centerY - 10, "Loading...", { font: "20px Arial" });
         this.sound.setDecodedCallback([ planetsSong.id ] , () => {
-            this.state.start('Game');
+            this.state.start('Start');
         }, this);
     }
 }
