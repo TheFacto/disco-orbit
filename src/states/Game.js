@@ -181,11 +181,7 @@ export default class extends Phaser.State {
         // setup callbacks
         this.game.input.keyboard.addCallbacks(this, this.keyDown, this.keyReleased, null);
 
-        this.missText = this.add.text(this.world.centerX, this.world.centerY + 30, 'Miss!', {
-            font: '28px Arial',
-            fill: '#dddddd',
-            align: 'center'
-        });
+        this.missText = this.add.bitmapText(this.world.centerX, this.world.centerY + 30, 'pixelfont-medium', 'Miss!');
         this.missText.anchor.setTo(0.5, 0.5);
 
         this.missText.alpha = 0;
