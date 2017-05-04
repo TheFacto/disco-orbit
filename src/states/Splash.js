@@ -1,8 +1,7 @@
 import Phaser from 'phaser';
 import { centerGameObjects } from '../utils';
 import satellites from "../satellites/satellites";
-import orbitalSong from '../songs/orbital';
-import legendsSong from '../songs/legends';
+import planetsSong from '../songs/planets';
 
 export default class extends Phaser.State {
     init () {}
@@ -13,11 +12,9 @@ export default class extends Phaser.State {
         centerGameObjects([this.loaderBg, this.loaderBar]);
 
         this.load.setPreloadSprite(this.loaderBar);
-        //
+
         // Audio
-        //
-        this.load.audio(orbitalSong.id, [`assets/music/${orbitalSong.asset}`]);
-        this.load.audio(legendsSong.id, [`assets/music/${legendsSong.asset}`]);
+        this.load.audio(planetsSong.id, [`assets/music/${planetsSong.asset}`]);
         this.load.audio('explosion1', ['assets/sounds/Explosion1.ogg']);
 
         //
@@ -49,7 +46,7 @@ export default class extends Phaser.State {
 
     create () {
         this.game.add.text(0, this.game.world.centerY - 10, "Loading...", { font: "20px Arial" });
-        this.sound.setDecodedCallback([ legendsSong.id ] , () => {
+        this.sound.setDecodedCallback([ planetsSong.id ] , () => {
             this.state.start('Instructions');
         }, this);
     }
